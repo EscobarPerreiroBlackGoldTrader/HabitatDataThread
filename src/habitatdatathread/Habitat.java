@@ -69,6 +69,10 @@ public class Habitat extends /*JApplet*/JPanel {
     private int period = 100; // частота обновления таймера
     private boolean emul_progress = false; // переключается нажатием T
     private boolean showtime = false; // переключается нажатием B
+
+    public boolean isEmul_progress() {
+        return emul_progress;
+    }
     
     private long startTime = 0, updaterPauseShift = 0, updaterPauseBeg =0;//, currentTime = 0;
     
@@ -420,7 +424,17 @@ public class Habitat extends /*JApplet*/JPanel {
             //currentTime = m_updater.get_currentTime();
             //startTime = m_updater.get_m_startTime();
             m_updater.pauseBeg();
+            
+            
+            setPausedMoto(true);
+            setPausedCar(true);
+            
+            
         }else{// возобновить
+            unfreezeCar();
+            unfreezeMoto();            
+            setPausedMoto(false);
+            setPausedCar(false);
             m_updater.pauseEnd();
             //m_updater.drop();
             //m_updater.set_m_startTime(startTime);

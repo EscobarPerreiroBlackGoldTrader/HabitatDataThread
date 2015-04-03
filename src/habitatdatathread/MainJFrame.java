@@ -5,10 +5,21 @@
  */
 package habitatdatathread;
 
+import java.awt.Font;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -29,7 +40,23 @@ public class MainJFrame extends javax.swing.JFrame {
         buttonGroup1.add(jRadioButton1);
         buttonGroup1.add(jRadioButton2);
         
+        
+        ff = new FileFilter() {
+
+                @Override
+                public boolean accept(File f) {
+                       return f.getName().endsWith(extension);
+                }
+
+                @Override
+                public String getDescription() {
+                    return extension+" Файл с данными и настройками эмуляции";
+                }
+            };
+        
+        
         //jLabel1.setVisible(false);
+        
     }
 
     public void keys_state_InStart(boolean start){ // управляет enabled/disabled свойствами кнопок (пуск,пауза,стоп)
@@ -54,6 +81,9 @@ public class MainJFrame extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jDialog2 = new javax.swing.JDialog();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea2 = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -82,13 +112,21 @@ public class MainJFrame extends javax.swing.JFrame {
         jComboBox_CarPrior = new javax.swing.JComboBox();
         jLabel7 = new javax.swing.JLabel();
         habitat1 = new habitatdatathread.Habitat();
+        jLabel_infopath = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        jMenu_File = new javax.swing.JMenu();
+        jMenuItem_loadfile = new javax.swing.JMenuItem();
+        jMenuItem_savefile = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenu_sim = new javax.swing.JMenu();
+        jMenuItem_startSim = new javax.swing.JMenuItem();
+        jMenuItem_stopSim = new javax.swing.JMenuItem();
+        jMenuItem_showhideTimer = new javax.swing.JMenuItem();
+        jMenu_console = new javax.swing.JMenu();
+        jMenuItem_consOpen = new javax.swing.JMenuItem();
+        jMenu_Help = new javax.swing.JMenu();
+        jMenuItem_About = new javax.swing.JMenuItem();
 
         jDialog1.setTitle("Результаты симуляции");
         jDialog1.setMinimumSize(new java.awt.Dimension(400, 300));
@@ -141,6 +179,23 @@ public class MainJFrame extends javax.swing.JFrame {
                     .addComponent(jButton4)
                     .addComponent(jButton5))
                 .addContainerGap())
+        );
+
+        jDialog2.setMinimumSize(new java.awt.Dimension(400, 300));
+
+        jTextArea2.setColumns(20);
+        jTextArea2.setRows(5);
+        jScrollPane2.setViewportView(jTextArea2);
+
+        javax.swing.GroupLayout jDialog2Layout = new javax.swing.GroupLayout(jDialog2.getContentPane());
+        jDialog2.getContentPane().setLayout(jDialog2Layout);
+        jDialog2Layout.setHorizontalGroup(
+            jDialog2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+        );
+        jDialog2Layout.setVerticalGroup(
+            jDialog2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -243,11 +298,11 @@ public class MainJFrame extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
                     .addComponent(jLabel3)
-                    .addComponent(jLabel2))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel2)
+                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -264,7 +319,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addContainerGap(130, Short.MAX_VALUE))
         );
 
         jTabbedPane_TabInterface.addTab("Генерация", jPanel4);
@@ -315,7 +370,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton_CarSleepAwake)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(162, Short.MAX_VALUE))
         );
 
         jTabbedPane_TabInterface.addTab("Заморозка", jPanel3);
@@ -366,7 +421,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox_CarPrior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(147, Short.MAX_VALUE))
+                .addContainerGap(167, Short.MAX_VALUE))
         );
 
         jTabbedPane_TabInterface.addTab("Приоритет", jPanel2);
@@ -428,48 +483,84 @@ public class MainJFrame extends javax.swing.JFrame {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        jMenu1.setText("Симуляция");
+        jMenu_File.setText("Файл");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, 0));
-        jMenuItem1.setText("Начать симуляцию");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem_loadfile.setText("Загрузить...");
+        jMenuItem_loadfile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                jMenuItem_loadfileActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        jMenu_File.add(jMenuItem_loadfile);
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, 0));
-        jMenuItem2.setText("Остановить симуляцию");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem_savefile.setText("Сохранить...");
+        jMenuItem_savefile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                jMenuItem_savefileActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem2);
+        jMenu_File.add(jMenuItem_savefile);
+        jMenu_File.add(jSeparator1);
 
-        jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, 0));
-        jMenuItem3.setText("Показать/Скрыть таймер ");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem1.setText("Выход");
+        jMenu_File.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu_File);
+
+        jMenu_sim.setText("Симуляция");
+
+        jMenuItem_startSim.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, 0));
+        jMenuItem_startSim.setText("Начать симуляцию");
+        jMenuItem_startSim.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                jMenuItem_startSimActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem3);
+        jMenu_sim.add(jMenuItem_startSim);
 
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Помощь");
-
-        jMenuItem4.setText("О программе...");
-        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem_stopSim.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, 0));
+        jMenuItem_stopSim.setText("Остановить симуляцию");
+        jMenuItem_stopSim.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem4ActionPerformed(evt);
+                jMenuItem_stopSimActionPerformed(evt);
             }
         });
-        jMenu2.add(jMenuItem4);
+        jMenu_sim.add(jMenuItem_stopSim);
 
-        jMenuBar1.add(jMenu2);
+        jMenuItem_showhideTimer.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, 0));
+        jMenuItem_showhideTimer.setText("Показать/Скрыть таймер ");
+        jMenuItem_showhideTimer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_showhideTimerActionPerformed(evt);
+            }
+        });
+        jMenu_sim.add(jMenuItem_showhideTimer);
+
+        jMenuBar1.add(jMenu_sim);
+
+        jMenu_console.setText("Консоль");
+
+        jMenuItem_consOpen.setText("Открыть...");
+        jMenuItem_consOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_consOpenActionPerformed(evt);
+            }
+        });
+        jMenu_console.add(jMenuItem_consOpen);
+
+        jMenuBar1.add(jMenu_console);
+
+        jMenu_Help.setText("Помощь");
+
+        jMenuItem_About.setText("О программе...");
+        jMenuItem_About.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem_AboutActionPerformed(evt);
+            }
+        });
+        jMenu_Help.add(jMenuItem_About);
+
+        jMenuBar1.add(jMenu_Help);
 
         setJMenuBar(jMenuBar1);
 
@@ -478,7 +569,9 @@ public class MainJFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(habitat1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(habitat1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel_infopath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -486,21 +579,24 @@ public class MainJFrame extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(habitat1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(habitat1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel_infopath, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+    private void jMenuItem_AboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_AboutActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem4ActionPerformed
+    }//GEN-LAST:event_jMenuItem_AboutActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuItem_startSimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_startSimActionPerformed
         // TODO add your handling code here:
         habitat1.start_sim();
         keys_state_InStart(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_jMenuItem_startSimActionPerformed
 
     private void habitat1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_habitat1KeyPressed
         // TODO add your handling code here:
@@ -550,13 +646,13 @@ public class MainJFrame extends javax.swing.JFrame {
         //jLabel1.setText("Key in JFrame is pressed");
     }//GEN-LAST:event_formKeyTyped
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void jMenuItem_stopSimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_stopSimActionPerformed
         // TODO add your handling code here:
         habitat1.stop_sim();
         keys_state_InStart(false);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_jMenuItem_stopSimActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    private void jMenuItem_showhideTimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_showhideTimerActionPerformed
         // TODO add your handling code here:
         if(habitat1.trig_timer()){
                         // если показ таймера включен
@@ -568,7 +664,7 @@ public class MainJFrame extends javax.swing.JFrame {
             
         }
         
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }//GEN-LAST:event_jMenuItem_showhideTimerActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // Отмена в диалоге
@@ -714,6 +810,128 @@ public class MainJFrame extends javax.swing.JFrame {
         habitat1.setCarPriority(prior);
     }//GEN-LAST:event_jComboBox_CarPriorActionPerformed
 
+    private void jMenuItem_consOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_consOpenActionPerformed
+        // Консоль->Открыть..
+        
+        jDialog2.setVisible(true);
+        
+    }//GEN-LAST:event_jMenuItem_consOpenActionPerformed
+
+    private void jMenuItem_savefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_savefileActionPerformed
+        // сохранить настройки и результаты симуляции в файл
+        
+        if(habitat1.isEmul_progress())habitat1.pause_sim();
+        
+        if(fds == null){
+            fds = new JFileChooser();
+            fds.resetChoosableFileFilters();
+            fds.addChoosableFileFilter(ff);
+            fds.setFileFilter(ff);
+            
+            //fds.setFileFilter(new FileNameExtensionFilter("txt", extensions);
+        }
+
+        switch(fds.showSaveDialog(/*jLabel1*/this)){
+            case JFileChooser.APPROVE_OPTION:
+                
+//                String filename = fds.getSelectedFile().getName();
+//                String dir = fds.getCurrentDirectory().toString();
+                File selectedFile = fds.getSelectedFile();
+        
+                try {
+                    ObjectOutputStream oos = 
+                            new ObjectOutputStream(new FileOutputStream(selectedFile.getAbsolutePath()+extension));
+                    oos.writeObject(habitat1);
+                    oos.flush();
+                    oos.close();
+                    
+//                    try {
+//                        Thread.sleep(3000);
+//                    } catch (InterruptedException ex) {
+//                       Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+                    
+                    
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        
+                
+                
+                
+                
+                String msg = "Результаты симуляции и настройки программы сохранены в файл:   ";
+                jLabel_infopath.setFont(new Font("Arial", Font.BOLD, 12));
+                jLabel_infopath.setText(msg+selectedFile.getAbsolutePath()+extension);
+                
+                // остановка 
+                habitat1.stop_sim();
+                keys_state_InStart(false);
+                jButton3.setText("Пауза"); // возвращает состояние кнопки пауза в исходное
+                break;
+                
+            case JFileChooser.CANCEL_OPTION:
+                //jLabel_infopath.setText("сохраненьице отменено");
+                    return;
+                //break;
+            case JFileChooser.ERROR_OPTION:
+                jLabel_infopath.setText("ошибочка сохраненьица");
+                break;
+        }
+        
+    }//GEN-LAST:event_jMenuItem_savefileActionPerformed
+
+    private void jMenuItem_loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_loadfileActionPerformed
+        // загрузить настройки и результаты симуляции из файла
+        
+        if(habitat1.isEmul_progress())habitat1.pause_sim();
+        
+        if(fdl == null){
+            fdl = new JFileChooser();
+            fdl.resetChoosableFileFilters();
+            fdl.addChoosableFileFilter(ff);
+            fdl.setFileFilter(ff);
+            
+        }
+        int result = fdl.showOpenDialog(/*jLabel1*/this);
+        
+        switch(result){
+            case JFileChooser.APPROVE_OPTION:
+                
+                File selectedFile = fdl.getSelectedFile();
+                
+        
+                try {
+                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(selectedFile));
+                    
+                    try {
+                        habitat1 = (Habitat)ois.readObject();
+                    } catch (ClassNotFoundException ex) {
+                        System.out.println("случилось страшное - ClassNotFoundException");
+                        Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                    ois.close();
+                    
+                } catch (IOException ex) {
+                    System.out.println("случилось страшное - IOException");
+                    Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        
+                
+                break;
+            case JFileChooser.CANCEL_OPTION:
+                return;
+                //break;
+            case JFileChooser.ERROR_OPTION:
+                jLabel_infopath.setText("ошибочка загрузочки");
+                break;
+        }
+        
+    }//GEN-LAST:event_jMenuItem_loadfileActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -752,6 +970,12 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private boolean done = false;
     
+    JFileChooser fds;
+    JFileChooser fdl;
+    
+    FileFilter ff ;
+    String extension = ".emd";
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private habitatdatathread.Habitat habitat1;
@@ -769,6 +993,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox jComboBox_CarPrior;
     private javax.swing.JComboBox jComboBox_MotoPrior;
     private javax.swing.JDialog jDialog1;
+    private javax.swing.JDialog jDialog2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -778,13 +1003,20 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JLabel jLabel_infopath;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem_About;
+    private javax.swing.JMenuItem jMenuItem_consOpen;
+    private javax.swing.JMenuItem jMenuItem_loadfile;
+    private javax.swing.JMenuItem jMenuItem_savefile;
+    private javax.swing.JMenuItem jMenuItem_showhideTimer;
+    private javax.swing.JMenuItem jMenuItem_startSim;
+    private javax.swing.JMenuItem jMenuItem_stopSim;
+    private javax.swing.JMenu jMenu_File;
+    private javax.swing.JMenu jMenu_Help;
+    private javax.swing.JMenu jMenu_console;
+    private javax.swing.JMenu jMenu_sim;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -792,7 +1024,10 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane_TabInterface;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
 }
