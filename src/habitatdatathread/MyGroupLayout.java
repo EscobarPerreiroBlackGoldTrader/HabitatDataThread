@@ -5,24 +5,18 @@
  */
 package habitatdatathread;
 
-import java.awt.image.BufferedImage;
+import java.awt.Container;
+import java.io.Serializable;
+import javax.swing.GroupLayout;
 
 /**
  *
  * @author iUser
  */
-public interface IBehaviour {
-    /**
-     * выводит строку имитирующую звуковой сигнал
-     * @return 
-     */
-    String Beep();
+public class MyGroupLayout extends GroupLayout implements Serializable{
 
-    boolean setPic(BufferedImage pic);
+    public MyGroupLayout(Container host) {
+        super(host);
+    }
     
-    BufferedImage getPic();
-    
-    
-    
-
 }

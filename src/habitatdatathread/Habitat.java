@@ -11,8 +11,13 @@ import javax.swing.*;
 //import java.net.URL;
 import java.awt.image.BufferedImage;
 import static java.awt.image.ImageObserver.ALLBITS;
+import java.io.FileNotFoundException;
 //import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PipedWriter;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,6 +26,8 @@ import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList; // !!
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.event.MouseInputAdapter;
 //==============================================================================
@@ -28,7 +35,7 @@ import javax.swing.event.MouseInputAdapter;
  *
  * @author iUser
  */
-public class Habitat extends /*JApplet*/JPanel {
+public class Habitat extends /*JApplet*/JPanel  implements Serializable {
     private Timer m_timer = new Timer(); //private javax.swing.Timer swTimer ;//= new javax.swing.Timer();
     //private Timer gUpd_timer = new Timer(); // вызывает обновление "холста"
     private Updater m_updater; 
@@ -109,18 +116,23 @@ public class Habitat extends /*JApplet*/JPanel {
     //private String PARAM_string_1 = "fileName";
     
     
+    //transient javax.swing.GroupLayout layout;
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        //layout = new javax.swing.GroupLayout(this);
+        //////////////////MyGroupLayout layout = new MyGroupLayout(this); //сделано для возможности сериализации
+        //this.setLayout(layout);
+        //GroupLayout.ParallelGroup pg = layout.createParallelGroup();
+//        layout.setHorizontalGroup(
+//            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addGap(0, 400, Short.MAX_VALUE)
+//        );
+//        layout.setVerticalGroup(
+//            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+//            .addGap(0, 300, Short.MAX_VALUE)
+//        );
+        
+        
     }// </editor-fold>   
 //==============================================================================
     void setMotoPriority(int prior) {
@@ -136,7 +148,7 @@ public class Habitat extends /*JApplet*/JPanel {
         
     } 
 //==============================================================================
-    private class Updater extends TimerTask {
+    private class Updater extends TimerTask implements Serializable{
         private Habitat m_aplet = null;
         private boolean m_firstRun = true; // первый ли запуск метода run()?
         private long m_startTime = 0; // время начала 
@@ -213,6 +225,8 @@ public class Habitat extends /*JApplet*/JPanel {
         //public long get_currentTime(){return (m_lastTime - m_startTime);}
         @Override
         public void run(){
+            
+            
             
             if(!paused){// если не на паузе
                 if(m_firstRun){
@@ -665,6 +679,51 @@ synchronized void unfreezeCar(){
 //    }
 //    
 //    
+private PipedWriter pw = new PipedWriter();    
+
+    public PipedWriter getStream() {
+        return pw;
+    }
     
+    
+    
+    
+public void run(){
+    for(int k=0; k< 10;++k)
+        try {
+            pw.write(k);
+            System.out.println("Writing " + k);
+        } catch (IOException ex) {
+            Logger.getLogger(Habitat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}
+    
+//==============================================================================
+//метод для определения тех объектов которые будут сериализованы и записаны в поток
+private void writeObject(ObjectOutputStream oos) throws IOException {
+    
+    //oos.writeObject(lst);
+    System.out.println("Началась сериализация");
+    oos.write(vel_count);
+    
+}
+
+private void readObject(ObjectInputStream ois) throws IOException, FileNotFoundException {
+    
+//        try {
+            //lst = ((CopyOnWriteArrayList<BaseAI>)ois.readObject());
+            
+            vel_count = (int)ois.readInt();
+            System.out.println(" ila-la-lala-lay: " + vel_count);
+            
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(Habitat.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+    
+}
+
 }// end
 //==============================================================================
+
+
+

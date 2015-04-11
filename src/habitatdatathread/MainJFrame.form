@@ -115,6 +115,9 @@
                 <Property name="columns" type="int" value="20"/>
                 <Property name="rows" type="int" value="5"/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new jMyTextArea(/*habitat1.getStream()*/)"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -728,6 +731,9 @@
       </SubComponents>
     </Container>
     <Container class="habitatdatathread.Habitat" name="habitat1">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="MainJFrame_habitat1"/>
+      </AuxValues>
 
       <Layout>
         <DimensionLayout dim="0">

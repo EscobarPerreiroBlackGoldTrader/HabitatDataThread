@@ -15,18 +15,20 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
  * @author iUser
  */
 public class MainJFrame extends javax.swing.JFrame {
-    //Habitat app;
+    
     /**
      * Creates new form MainJFrame
      */
@@ -35,10 +37,14 @@ public class MainJFrame extends javax.swing.JFrame {
         // необходим для получения фокуса после старта приложения
         // (иначе не будут работать кнопки)
         habitat1.requestFocusInWindow();
-        
+        ((jMyTextArea)jTextArea2).initPW(habitat1.getStream());
         //jRadioButton2.
+        execConsole = Executors.newCachedThreadPool();
+        
+        
         buttonGroup1.add(jRadioButton1);
         buttonGroup1.add(jRadioButton2);
+        
         
         
         ff = new FileFilter() {
@@ -83,7 +89,7 @@ public class MainJFrame extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jDialog2 = new javax.swing.JDialog();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        jTextArea2 = new jMyTextArea(/*habitat1.getStream()*/);
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -812,8 +818,14 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jMenuItem_consOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_consOpenActionPerformed
         // Консоль->Открыть..
-        
+        jTextArea2.setText("localhost#");
         jDialog2.setVisible(true);
+        
+        ct = new Thread(((jMyTextArea)jTextArea2));
+        execConsole.execute(ct);
+        
+        //((jMyTextArea)jTextArea2).run();/**/
+        habitat1.run();
         
     }//GEN-LAST:event_jMenuItem_consOpenActionPerformed
 
@@ -839,9 +851,21 @@ public class MainJFrame extends javax.swing.JFrame {
                 File selectedFile = fds.getSelectedFile();
         
                 try {
+                    System.out.println("Создаём OOS");
                     ObjectOutputStream oos = 
                             new ObjectOutputStream(new FileOutputStream(selectedFile.getAbsolutePath()+extension));
-                    oos.writeObject(habitat1);
+                    System.out.println("Начинаем запись");
+
+//                    for(Iterator<BaseAI> it = habitat1.lst.iterator();it.hasNext();){
+//                        oos.writeObject(it.next());
+//                    }
+                    
+                    // планировалось, что будет работать
+                    
+                    oos.writeObject(habitat1.lst); 
+                    
+                    
+                    System.out.println("Начинаем flush()");
                     oos.flush();
                     oos.close();
                     
@@ -855,13 +879,10 @@ public class MainJFrame extends javax.swing.JFrame {
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
+                    System.out.println("случилось страшное при сохранении - IOException");
                     Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
         
-                
-                
-                
-                
                 String msg = "Результаты симуляции и настройки программы сохранены в файл:   ";
                 jLabel_infopath.setFont(new Font("Arial", Font.BOLD, 12));
                 jLabel_infopath.setText(msg+selectedFile.getAbsolutePath()+extension);
@@ -907,16 +928,35 @@ public class MainJFrame extends javax.swing.JFrame {
                     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(selectedFile));
                     
                     try {
-                        habitat1 = (Habitat)ois.readObject();
+                        
+//                        BaseAI p = (BaseAI)ois.readObject();
+//                        habitat1.lst = (CopyOnWriteArrayList<BaseAI>)ois.readObject();
+                          
+                          habitat1.lst = (/*Habitat*/CopyOnWriteArrayList<BaseAI>)ois.readObject();
+                        /*
+                          if(habitat1.lst == null){
+                              habitat1.lst = new CopyOnWriteArrayList<BaseAI>();
+                          }else{
+                              habitat1.lst.clear();
+                          }
+                          Object o = null;
+                          while(selectedFile.){
+                            o = ois.readObject();
+                           System.out.println(o.getClass());
+                              
+                            habitat1.lst.add((BaseAI)o);
+                          }
+//                        habitat1.lst.add(1, p);
+                        */
                     } catch (ClassNotFoundException ex) {
-                        System.out.println("случилось страшное - ClassNotFoundException");
+                        System.out.println("случилось страшное при загрузке - ClassNotFoundException");
                         Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     
                     ois.close();
                     
                 } catch (IOException ex) {
-                    System.out.println("случилось страшное - IOException");
+                    System.out.println("случилось страшное при загрузке - IOException");
                     Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
         
@@ -975,6 +1015,10 @@ public class MainJFrame extends javax.swing.JFrame {
     
     FileFilter ff ;
     String extension = ".emd";
+    
+    private Thread ct; // ссылка на поток в котором выполняется консоль
+    private ExecutorService execConsole;
+    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

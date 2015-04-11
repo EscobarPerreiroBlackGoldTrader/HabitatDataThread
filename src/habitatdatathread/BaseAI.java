@@ -5,21 +5,32 @@
  */
 package habitatdatathread;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 /**
  *
  * @author iUser
  */
-public abstract class BaseAI implements IBehaviour, Runnable {
+public abstract class BaseAI implements IBehaviour, Runnable, Serializable {
     int x;
     int y; 
     
     //boolean paused = false;
-    
-    Thread t;
+    /**
+     *проверить на исключени€ сериализации
+     */
+    /*transient*/ Thread t; 
     /*private*/ int speed;
     
     boolean going = true;
-    Habitat parent;
+    /**
+     *проверить на исключени€ сериализации
+     */
+    transient Habitat parent; 
     
     public BaseAI(Habitat parrentObj){ // конструктор
         this.speed = 1;
@@ -63,5 +74,26 @@ public abstract class BaseAI implements IBehaviour, Runnable {
 //        paused = true;
 //        /*while(paused)*/ Thread.sleep(2000);
 //    }
+// 
+////==============================================================================
+////метод дл€ определени€ тех объектов которые будут сериализованы и записаны в поток
+//private void writeObject(ObjectOutputStream oos) throws IOException {
 //    
+//    //oos.writeObject(lst);
+//    System.out.println("Ќачалась запись, сериализаци€, пишем x");
+//    oos.write(x);
+//    System.out.println("пишем y");
+//    oos.write(y);
+//    
+//}
+//
+//private void readObject(ObjectInputStream ois) throws IOException, FileNotFoundException {
+//    System.out.println("Ќачалось чтение, сериализаци€, читаем x");
+//    x = (int)ois.readInt();
+//    System.out.println("читаем y");
+//    y = (int)ois.readInt();  
+//
+//}
+////==============================================================================
+//  
 }

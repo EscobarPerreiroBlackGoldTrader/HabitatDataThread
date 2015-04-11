@@ -6,6 +6,7 @@
 package habitatdatathread;
 
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author iUser
  */
-public class Car extends BaseAI {
+public class Car extends BaseAI implements Serializable{
 
     /*Thread t;*/
     private int p_w; // parent width
@@ -84,7 +85,7 @@ public class Car extends BaseAI {
     /**
      * хранит ссылку на картинку 
      */
-    private BufferedImage pic;
+    transient private BufferedImage pic;
 
     @Override
     public BufferedImage getPic() {

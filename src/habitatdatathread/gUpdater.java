@@ -13,6 +13,9 @@ import java.util.logging.Logger;
 /**
  *
  * @author iUser
+ *  ласс созданный специально чтобы выполн€€сь в отдельном потоке 
+ * обновл€ть экран программы (вызывать метод repaint() с периодичностью 
+ * хран€щейс€ в константе CLOCK_RATE котора€ определена в Habitat)
  */
 public class gUpdater implements Runnable/*extends TimerTask*/{
     Habitat mainT;
