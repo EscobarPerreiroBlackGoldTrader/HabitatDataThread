@@ -7,9 +7,6 @@ package habitatdatathread;
 
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -18,18 +15,18 @@ import java.util.logging.Logger;
 public class Car extends BaseAI implements Serializable{
 
     /*Thread t;*/
-    private int p_w; // parent width
-    boolean freezeUP; // переменная необходима для переключения в состояния замри/отомри
+    //private int p_w; // parent width
+    //boolean freezeUP; // переменная необходима для переключения в состояния замри/отомри
     
     
     public Car(Habitat obj){
         super(obj);
-        this.p_w = parent.getWidth();
-        pic = null;
-        speed = 3;
+        //this.p_w = parent.getWidth();
+        //pic = null;
+        //speed = 13;
     }
     
-    
+    /* // машины теперь двигает один общий поток
     @Override
     public void run(){ // переопределённый метод для 
                        // выполнения кода в отдельном потоке
@@ -66,29 +63,30 @@ public class Car extends BaseAI implements Serializable{
         freezeUP = false;
         notify();
     }
+    */
     
     @Override
     public String Beep() {
       return "Im a Car";
     }
 
-    @Override
-    public boolean setPic(BufferedImage pic) {
-        if(pic != null){
-            this.pic = pic;
-            return true;
-        }else{
-            return false;
-        }
-    }
+//    @Override
+//    public boolean setPic(BufferedImage pic) {
+//        if(pic != null){
+//            this.pic = pic;
+//            return true;
+//        }else{
+//            return false;
+//        }
+//    }
     
     /**
      * хранит ссылку на картинку 
      */
-    transient private BufferedImage pic;
+    //transient private BufferedImage pic;
 
-    @Override
-    public BufferedImage getPic() {
-        return this.pic;
-    }
+//    @Override
+//    public BufferedImage getPic() {
+//        return this.pic;
+//    }
 }

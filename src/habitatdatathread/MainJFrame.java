@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -894,9 +895,10 @@ public class MainJFrame extends javax.swing.JFrame {
                 break;
                 
             case JFileChooser.CANCEL_OPTION:
-                //jLabel_infopath.setText("сохраненьице отменено");
-                    return;
-                //break;
+                jLabel_infopath.setText("сохраненьице отменено");
+                // если была приостанровлена симул€ци€ - возобновить
+                if(!habitat1.isEmul_progress())habitat1.pause_sim();    
+                break;
             case JFileChooser.ERROR_OPTION:
                 jLabel_infopath.setText("ошибочка сохраненьица");
                 break;
@@ -907,16 +909,16 @@ public class MainJFrame extends javax.swing.JFrame {
     private void jMenuItem_loadfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_loadfileActionPerformed
         // загрузить настройки и результаты симул€ции из файла
         
-        if(habitat1.isEmul_progress())habitat1.pause_sim();
+        if(habitat1.isEmul_progress())habitat1.pause_sim(); // если идЄт симул€ци€ - приостановить
         
-        if(fdl == null){
+        if(fdl == null){// создать диалог выбора файла если ещЄ не создан
             fdl = new JFileChooser();
             fdl.resetChoosableFileFilters();
             fdl.addChoosableFileFilter(ff);
             fdl.setFileFilter(ff);
             
         }
-        int result = fdl.showOpenDialog(/*jLabel1*/this);
+        int result = fdl.showOpenDialog(/*jLabel1*/this); // 
         
         switch(result){
             case JFileChooser.APPROVE_OPTION:
@@ -959,12 +961,39 @@ public class MainJFrame extends javax.swing.JFrame {
                     System.out.println("случилось страшное при загрузке - IOException");
                     Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-        
+                
+                //-------------- восстановление остальных необходимых данных ----------------
+                
+                int mc=0,cc=0;
+                
+                for(Iterator<BaseAI> it = habitat1.lst.iterator();it.hasNext();){
+                    BaseAI next = it.next();
+                    if(next instanceof Car){
+                        System.out.println("Im Find a Car in lst in load time");
+                        ++cc;
+                    }
+                    else if(next instanceof Moto){
+                        System.out.println("Im Find a Moto in lst in load time");
+                        ++mc;
+                    }
+                    else System.out.println("Im Find BaseAI - sorry!!! >_< ");
+                }
+                
+                habitat1.setVel_count(habitat1.lst.size());
+                habitat1.setCar_count(cc);
+                habitat1.setMoto_count(mc);
+                //---------------------------------------------------------------------------
+                
+                keys_state_InStart(true);
+                //this.jButton3.doClick(); //не срабатывает
                 
                 break;
             case JFileChooser.CANCEL_OPTION:
-                return;
-                //break;
+                jLabel_infopath.setText("загрузка отменена");
+                // если была приостанровлена симул€ци€ - возобновить
+                if(!habitat1.isEmul_progress())habitat1.pause_sim(); 
+
+                break;
             case JFileChooser.ERROR_OPTION:
                 jLabel_infopath.setText("ошибочка загрузочки");
                 break;

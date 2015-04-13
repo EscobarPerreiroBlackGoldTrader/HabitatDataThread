@@ -5,28 +5,28 @@
  */
 package habitatdatathread;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
  *
  * @author iUser
  */
-public abstract class BaseAI implements IBehaviour, Runnable, Serializable {
-    int x;
-    int y; 
+public abstract class BaseAI implements IBehaviour/*, Runnable*/, Serializable {
+   private int x;
+   private int y; 
     
     //boolean paused = false;
     /**
-     *проверить на исключения сериализации
+     * проверить на исключения сериализации.
+     * Проверено, наличие ссылки на поток приводит к NotSerializableException
+     * при попытке сериализации lst
+     * Следует исключить этуссылку!
      */
-    /*transient*/ Thread t; 
+    ///*transient*/ Thread t; 
+    
     /*private*/ int speed;
     
-    boolean going = true;
+    //boolean going = true;
     /**
      *проверить на исключения сериализации
      */
@@ -45,8 +45,8 @@ public abstract class BaseAI implements IBehaviour, Runnable, Serializable {
     /*public void setSpeed(int speed){this.speed = speed;}
     public int getSpeed(){return this.speed;}*/
     
-    @Override
-    public abstract void run(); // переопределить для реализации потока
+//    @Override
+//    public abstract void run(); // переопределить для реализации потока
     
     
     public int mooveX(int speed){
@@ -68,6 +68,32 @@ public abstract class BaseAI implements IBehaviour, Runnable, Serializable {
         this.y += this.speed;
         return y;
     }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+    
+    
     
 //    public synchronized void setPaused() 
 //            throws InterruptedException{

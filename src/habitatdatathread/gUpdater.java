@@ -18,18 +18,19 @@ import java.util.logging.Logger;
  * хранящейся в константе CLOCK_RATE которая определена в Habitat)
  */
 public class gUpdater implements Runnable/*extends TimerTask*/{
-    Habitat mainT;
+    Habitat mother;
     
     gUpdater(Habitat  maintread){
-        this.mainT = maintread;
+        this.mother = maintread;
     }
     
     @Override
     public void run(){
         while(true){
-            mainT.repaint();
+            mother.repaint();
+            //System.out.println("перерисовал");
             try {
-                TimeUnit.MILLISECONDS.sleep(mainT.CLOCK_RATE);
+                TimeUnit.MILLISECONDS.sleep(mother.CLOCK_RATE);
             } catch (InterruptedException ex) {
                 Logger.getLogger(gUpdater.class.getName()).log(Level.SEVERE, null, ex);
             }
