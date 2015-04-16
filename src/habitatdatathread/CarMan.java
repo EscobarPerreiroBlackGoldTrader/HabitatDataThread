@@ -44,6 +44,20 @@ public class CarMan extends Thread{
     @Override
     public void run(){
         while(going){
+            
+            //-------------------------------------
+            if(mother.isPausedCar()){
+                freezeUP = true;
+                try {
+                    freeze();
+                } catch (InterruptedException ex) {
+                    System.out.println("Кошмар - InterruptedException при попытке заморозить поток машин (не в цикле просмотра листа)");
+                    Logger.getLogger(CarMan.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            //-------------------------------------
+            
             setLst(mother.lst);//иначе обновить ссылку на lst не получается 
                                //необходимо обновлять ссылку на лист, 
                                //иначе после загрузки листа будет указывать 
@@ -54,7 +68,7 @@ public class CarMan extends Thread{
             
             //**************************************************************
             for(Iterator<BaseAI> it = lst.iterator();it.hasNext();){
-                //System.out.println("начинаю искать машину");
+                System.out.println("начинаю искать машину");
                 if(mother.isPausedCar()){
                     freezeUP = true;
                     try {
@@ -67,7 +81,7 @@ public class CarMan extends Thread{
                 
                a = it.next();
                if(a instanceof Car){
-                   //System.out.println("нашёл машину, начинаю двигать");
+                   System.out.println("нашёл машину, начинаю двигать");
                    x = a.getX();
                    if(x < p_w){
                        a.mooveX();
@@ -75,7 +89,7 @@ public class CarMan extends Thread{
                    }
                    if(x >= p_w)a.setX(0); 
                }
-               //System.out.println("закончил одну итерацию поиска машин");
+               System.out.println("закончил одну итерацию поиска машин");
                     
             }// end of for
             //**************************************************************
@@ -88,7 +102,7 @@ public class CarMan extends Thread{
             }
             Thread.yield();
             mother.repaint();
-            //System.out.println("перерисовываю из CarMan");
+            System.out.println("перерисовываю из CarMan");
         }
     }
     
@@ -99,5 +113,9 @@ public class CarMan extends Thread{
     public synchronized void unfreeze(){
         freezeUP = false;
         notify();
+    }
+    
+    public void workDone(){
+        this.going = false;
     }
 }

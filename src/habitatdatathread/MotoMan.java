@@ -35,6 +35,20 @@ public class MotoMan extends Thread{
     @Override
     public void run(){
         while(going){
+            
+            //------------------------
+            if(mother.isPausedMoto()){
+                    freezeUP = true;
+                   try {
+                       freeze();
+                   } catch (InterruptedException ex) {
+                       System.out.println("Кошмар - InterruptedException при попытке заморозить поток мотоциклов (не в цикле просмотра листа)");
+                       Logger.getLogger(MotoMan.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+                } 
+            
+            //------------------------
+            
             setLst(mother.lst);//иначе обновить ссылку на lst не получается 
                                //необходимо обновлять ссылку на лист, 
                                //иначе после загрузки листа будет указывать 
@@ -87,5 +101,9 @@ public class MotoMan extends Thread{
     public synchronized void unfreeze(){
         freezeUP = false;
         notify();
+    }
+    
+    public void workDone(){
+        this.going = false;
     }
 }

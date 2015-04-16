@@ -35,13 +35,23 @@ public class MainJFrame extends javax.swing.JFrame {
      */
     public MainJFrame() {
         initComponents();
+        
         // необходим для получения фокуса после старта приложения
         // (иначе не будут работать кнопки)
         habitat1.requestFocusInWindow();
-        ((jMyTextArea)jTextArea2).initPW(habitat1.getStream());
-        //jRadioButton2.
-        execConsole = Executors.newCachedThreadPool();
         
+        conl = new ConsListner(habitat1);
+
+        // канал для обратной связи
+        conl.initPW(((jMyTextArea)jTextArea2).getWrite_Stream());
+        
+        
+        // создание канала связи между потоками консоли и основного окна приложения
+        ((jMyTextArea)jTextArea2).initPW(habitat1.getWr_Stream());
+        
+        //создание  экзекутора для консоли
+        execConsole = Executors.newCachedThreadPool();
+        execConsListener = Executors.newCachedThreadPool(); // для запуска прослушки консоли в отдельном потоке
         
         buttonGroup1.add(jRadioButton1);
         buttonGroup1.add(jRadioButton2);
@@ -192,6 +202,11 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jTextArea2.setColumns(20);
         jTextArea2.setRows(5);
+        jTextArea2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextArea2KeyPressed(evt);
+            }
+        });
         jScrollPane2.setViewportView(jTextArea2);
 
         javax.swing.GroupLayout jDialog2Layout = new javax.swing.GroupLayout(jDialog2.getContentPane());
@@ -819,14 +834,24 @@ public class MainJFrame extends javax.swing.JFrame {
 
     private void jMenuItem_consOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_consOpenActionPerformed
         // Консоль->Открыть..
-        jTextArea2.setText("localhost#");
+        //jTextArea2.setText("localhost#");
         jDialog2.setVisible(true);
         
-        ct = new Thread(((jMyTextArea)jTextArea2));
-        execConsole.execute(ct);
+        
+        if(ct == null){ // если указатель на поток консоли пуст
+            ct = new Thread(((jMyTextArea)jTextArea2)); // создать поток консоли
+            execConsole.execute(ct);// начать выполнение консоли в новом потоке
+        }
+        
+        if(clt == null){
+            clt = new Thread(conl);
+            execConsListener.execute(clt);
+        }
+            
+        
         
         //((jMyTextArea)jTextArea2).run();/**/
-        habitat1.run();
+        //habitat1.write_to_console(null);
         
     }//GEN-LAST:event_jMenuItem_consOpenActionPerformed
 
@@ -875,8 +900,7 @@ public class MainJFrame extends javax.swing.JFrame {
 //                    } catch (InterruptedException ex) {
 //                       Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
 //                    }
-                    
-                    
+  
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(MainJFrame.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -984,7 +1008,9 @@ public class MainJFrame extends javax.swing.JFrame {
                 habitat1.setMoto_count(mc);
                 //---------------------------------------------------------------------------
                 
-                keys_state_InStart(true);
+                habitat1.repaint();
+                
+                //keys_state_InStart(true);
                 //this.jButton3.doClick(); //не срабатывает
                 
                 break;
@@ -1000,6 +1026,16 @@ public class MainJFrame extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_jMenuItem_loadfileActionPerformed
+
+    private void jTextArea2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextArea2KeyPressed
+        // нажали Enter в консоли
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            String s = jTextArea2.getText();
+            s = s + "\n\n";
+            jTextArea2.setText(null);
+            ((jMyTextArea)jTextArea2).write_to_ConsListener(s);
+        }
+    }//GEN-LAST:event_jTextArea2KeyPressed
 
     /**
      * @param args the command line arguments
@@ -1046,8 +1082,10 @@ public class MainJFrame extends javax.swing.JFrame {
     String extension = ".emd";
     
     private Thread ct; // ссылка на поток в котором выполняется консоль
+    private Thread clt; // ссылка на поток в котором выполняется прослушивальщик консоли
     private ExecutorService execConsole;
-    
+    private ExecutorService execConsListener;
+    private ConsListner conl;
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

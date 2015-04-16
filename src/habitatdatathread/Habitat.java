@@ -8,18 +8,14 @@ package habitatdatathread;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-//import java.net.URL;
 import java.awt.image.BufferedImage;
 import static java.awt.image.ImageObserver.ALLBITS;
-//import java.io.File;
 import java.io.IOException;
 import java.io.PipedWriter;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
-//import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList; // !!
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,11 +36,12 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
     //int counter=0;
     
     
-    Thread ThreadCarManager;
-    Thread ThreadMotoManager;
+    CarMan /*Thread*/ ThreadCarManager;
+    MotoMan /*Thread*/ ThreadMotoManager;
     
     ExecutorService execCars; 
     ExecutorService execMoto;
+    
     
 //    ThreadGroup groupMoto;
 //    ThreadGroup groupCar;
@@ -181,7 +178,7 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
         ThreadCarManager.setPriority(prior);
     } 
 //==============================================================================
-    private class Updater extends TimerTask implements Serializable{
+    private class Updater extends TimerTask /*implements Serializable*/{
         private Habitat m_aplet = null;
         private boolean m_firstRun = true; // первый ли запуск метода run()?
         private long m_startTime = 0; // врем€ начала 
@@ -299,6 +296,7 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
         
         execCars = Executors.newCachedThreadPool();
         execMoto = Executors.newCachedThreadPool();
+        
         //execMoto = Executors.newScheduledThreadPool(5000);
 //        groupCar = new ThreadGroup("Cars");
 //        groupMoto = new ThreadGroup("Motos");
@@ -343,7 +341,6 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
         
         //---------------------------------
         KeyAdapter pk;
-        
         pk = new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e){
@@ -376,11 +373,20 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
             
         } 
     };
+        
         ThreadCarManager = new CarMan(this);
         ThreadMotoManager = new MotoMan(this);
         
+        
+        ///--- необходимо дл€ приостановки перебора листа внешними двулм€ потоками ---
+        setPausedCar(true);
         execCars.execute(ThreadCarManager);
+        setPausedMoto(true);
         execMoto.execute(ThreadMotoManager);
+        //----------------------------------------------------------------------------
+        
+        
+        //pause_sim();
         
         this.addKeyListener(pk);
         Init();
@@ -442,7 +448,11 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
     public void start_sim(){ // запустить симул€цию
         System.out.println("B is pressed");
         emul_progress = true;
-        repaint();
+        //repaint();
+        setPausedCar(false);
+        setPausedMoto(false);
+        unfreezeCar();
+        unfreezeMoto();
         
         m_updater.go();
     }
@@ -465,8 +475,14 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
 //        }
         
         //два потока управлени€ машинами и мотоциклами
-        ((CarMan)ThreadCarManager).going = false;
-        ((MotoMan)ThreadMotoManager).going = false;
+        
+        //ThreadCarManager.workDone();
+        //ThreadMotoManager.workDone();
+        setPausedCar(true);
+        setPausedMoto(true);
+        
+        //((CarMan)ThreadCarManager).going = false;
+        //((MotoMan)ThreadMotoManager).going = false;
         
         lst.clear();
         m_updater.finish();
@@ -475,6 +491,7 @@ public class Habitat extends /*JApplet*/JPanel  implements Serializable {
     }
 //==============================================================================
     public boolean pause_sim(){
+        System.out.println("—работала пауза pause_sim()");
         if(emul_progress){//пауза
             //currentTime = m_updater.get_currentTime();
             //startTime = m_updater.get_m_startTime();
@@ -755,21 +772,65 @@ synchronized void unfreezeCar(){
 //    }
    
    
-private PipedWriter pw = new PipedWriter();    
+private PipedWriter pw = new PipedWriter();
 
-    public PipedWriter getStream() {
+
+//private PipedReader pr_income_form_console;
+
+
+    public PipedWriter getWr_Stream() {
         return pw;
     }    
     
-public void run(){
-    for(int k=0; k< 10;++k)
-        try {
-            pw.write(k);
-            System.out.println("Writing " + k);
-        } catch (IOException ex) {
-            Logger.getLogger(Habitat.class.getName()).log(Level.SEVERE, null, ex);
+//    public void initPW(PipedWriter pw){
+//        try {
+//            this.pr_income_form_console = new PipedReader(pw);
+//        } catch (IOException ex) {
+//            Logger.getLogger(jMyTextArea.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
+    
+    
+    public void write_to_console(String s){
+        if(s == null){
+            for(int k=0; k< 10;++k)
+                try {
+                    pw.write(String.valueOf(k));
+                    System.out.println("Writing " + k);
+                } catch (IOException ex) {
+                    Logger.getLogger(Habitat.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        }else {
+            try {
+                
+                pw.write(s);
+            } catch (IOException ex) {
+                Logger.getLogger(Habitat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }   
+    }
+
+    public void ReduceMotoCountBy(int val){
+        synchronized(lst){
+            System.out.println("вошЄл в синхронизацию с листом");
+            Integer ostatok = moto_count % val;
+            System.out.println("ќстаток от делени€ " + ostatok);
+            Integer new_mc = moto_count - ostatok;
+            
+            int c=0; 
+            for(Iterator<BaseAI> it = lst.iterator(); it.hasNext() && c < ostatok; ){
+                BaseAI next = it.next();
+                if(next instanceof Moto){
+                    if(lst.remove(next)){
+                        System.out.println("удалил мотоцикл");
+                        write_to_console("удалил мотоцикл\n");
+                    }
+                    ++c;
+                }
+            }
+            moto_count = new_mc;
         }
-}
+    }
     
 ////==============================================================================
 ////метод дл€ определени€ тех объектов которые будут сериализованы и записаны в поток

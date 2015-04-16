@@ -5,6 +5,7 @@
  */
 package habitatdatathread;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
@@ -19,6 +20,13 @@ import javax.swing.JTextArea;
 public class jMyTextArea extends JTextArea implements Runnable{
     private PipedReader pr;
 
+    //-- для обратной связи --
+    private PipedWriter out_pw = new PipedWriter();
+
+    public PipedWriter getWrite_Stream() {
+        return out_pw;
+    }
+    //------------------------
     
     public jMyTextArea(){} 
     
@@ -39,15 +47,32 @@ public class jMyTextArea extends JTextArea implements Runnable{
     }
     
     
-    public PipedReader getStream() {
+    public PipedReader getReead_Stream() {
         return pr;
     }
+    
+    public void write_to_ConsListener(String s){
+        try {
+            out_pw.write(/*(s.toCharArray())*/ s);
+        } catch (IOException ex) {
+            Logger.getLogger(jMyTextArea.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    //private DataInputStream dis = new DataInputStream(pr);
     
     @Override
     public void run() {
         while(true){
             try {
-                System.out.println("jMyTextArea Reeding ... " + pr.read());
+                char ch =  (char)pr.read();
+                
+                System.out.println("jMyTextArea Reeding ... " + ch);
+                
+                this.append(String.valueOf(ch));
+                
+                //this.setText();
             } catch (IOException ex) {
                 Logger.getLogger(jMyTextArea.class.getName()).log(Level.SEVERE, null, ex);
                 System.out.println("jMyTextArea Jobs finishing...");
