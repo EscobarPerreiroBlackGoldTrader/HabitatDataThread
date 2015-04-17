@@ -15,10 +15,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -74,14 +74,25 @@ public class MainJFrame extends javax.swing.JFrame {
         
         //jLabel1.setVisible(false);
         
+        // ------- переделать на static при случае ------
+        sMan = new SettingsMan();
+        if( setGUIState(sMan.settings_load()) ){
+            System.out.println("настройки успешно загружены");
+        }
+        // ----------------------------------------------
     }
 
-    public void keys_state_InStart(boolean start){ // управляет enabled/disabled свойствами кнопок (пуск,пауза,стоп)
-        jButton1.setEnabled(!start); // инвертировать кнопку старт
-        jButton2.setEnabled(start);  // инвертировать кнопку стоп
-        jButton3.setEnabled(start);  // инвертировать кнопку пауза
+    public void keys_state_InStart(/*boolean start*/){ // управляет enabled/disabled свойствами кнопок (пуск,пауза,стоп)
+        jButton1.setEnabled(/*!start*/true); // инвертировать кнопку старт
+        jButton2.setEnabled(/*start*/false);  // инвертировать кнопку стоп
+        jButton3.setEnabled(/*start*/false);  // инвертировать кнопку пауза
     }
     
+    public void keys_state_InProgress(){
+        jButton1.setEnabled(false); // кнопка старт
+        jButton2.setEnabled(true); // кнопка стоп 
+        jButton3.setEnabled(true); // кнопка пауза
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -224,6 +235,11 @@ public class MainJFrame extends javax.swing.JFrame {
         setTitle("Симуляция");
         setBackground(new java.awt.Color(102, 204, 0));
         setForeground(java.awt.Color.pink);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 formKeyTyped(evt);
@@ -257,6 +273,7 @@ public class MainJFrame extends javax.swing.JFrame {
         });
 
         jRadioButton1.setText("показать таймер");
+        jRadioButton1.setName("показать_таймер"); // NOI18N
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton1ActionPerformed(evt);
@@ -265,6 +282,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jRadioButton2.setSelected(true);
         jRadioButton2.setText("скрыть таймер");
+        jRadioButton2.setName("скрыть_таймер"); // NOI18N
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton2ActionPerformed(evt);
@@ -282,6 +300,7 @@ public class MainJFrame extends javax.swing.JFrame {
         jTabbedPane_TabInterface.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
 
         jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000" }));
+        jComboBox3.setName("период_рождения_мс"); // NOI18N
         jComboBox3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox3ActionPerformed(evt);
@@ -292,6 +311,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%" }));
         jComboBox2.setSelectedIndex(2);
+        jComboBox2.setName("вероятность_появления_мотоцикла"); // NOI18N
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
@@ -302,6 +322,7 @@ public class MainJFrame extends javax.swing.JFrame {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "0%", "10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%" }));
         jComboBox1.setSelectedIndex(3);
+        jComboBox1.setName("вероятность_появления_машины"); // NOI18N
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -400,6 +421,7 @@ public class MainJFrame extends javax.swing.JFrame {
         jLabel5.setText("Мотоцикл");
 
         jComboBox_MotoPrior.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        jComboBox_MotoPrior.setName("мотоцикл_приоритет"); // NOI18N
         jComboBox_MotoPrior.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_MotoPriorActionPerformed(evt);
@@ -409,6 +431,7 @@ public class MainJFrame extends javax.swing.JFrame {
         jLabel6.setText("Машина");
 
         jComboBox_CarPrior.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        jComboBox_CarPrior.setName("машина_приоритет"); // NOI18N
         jComboBox_CarPrior.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox_CarPriorActionPerformed(evt);
@@ -617,7 +640,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private void jMenuItem_startSimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_startSimActionPerformed
         // TODO add your handling code here:
         habitat1.start_sim();
-        keys_state_InStart(true);
+        keys_state_InProgress();
     }//GEN-LAST:event_jMenuItem_startSimActionPerformed
 
     private void habitat1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_habitat1KeyPressed
@@ -628,7 +651,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 case KeyEvent.VK_B: // запустить симуляцию
                     //jLabel1.setText("B is pressed");
                     habitat1.start_sim();
-                    keys_state_InStart(true);
+                    keys_state_InProgress();
                     /*jButton1.setEnabled(false); // погасить кнопку старт
                     jButton2.setEnabled(true);  // активировать кнопку стоп
                     jButton3.setEnabled(true);  // активировать кнопку пауза*/
@@ -640,7 +663,7 @@ public class MainJFrame extends javax.swing.JFrame {
                     /*jButton1.setEnabled(true); // активировать кнопку старт
                     jButton2.setEnabled(false);  // погасить кнопку стоп
                     jButton3.setEnabled(false);  // погасить кнопку пауза*/
-                    keys_state_InStart(false);
+                    keys_state_InStart(); 
                     break;
                 case KeyEvent.VK_T: //показать/скрыть таймер
                     //jLabel1.setText("T is pressed");
@@ -671,7 +694,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private void jMenuItem_stopSimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_stopSimActionPerformed
         // TODO add your handling code here:
         habitat1.stop_sim();
-        keys_state_InStart(false);
+        keys_state_InStart();
     }//GEN-LAST:event_jMenuItem_stopSimActionPerformed
 
     private void jMenuItem_showhideTimerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem_showhideTimerActionPerformed
@@ -765,7 +788,7 @@ public class MainJFrame extends javax.swing.JFrame {
                 // нажал ОК - тогда заканчиваем симуляцию
                 jDialog1.dispose();
                 habitat1.stop_sim();
-                keys_state_InStart(false);
+                keys_state_InStart();
                 jButton3.setText("Пауза"); // возвращает состояние кнопки пауза в исходное
 
             }else{
@@ -776,7 +799,7 @@ public class MainJFrame extends javax.swing.JFrame {
         }else{ // если птичка jCheckBox1 не нажата
 
             habitat1.stop_sim();
-            keys_state_InStart(false);
+            keys_state_InStart();
             jButton3.setText("Пауза"); // возвращает состояние кнопки пауза в исходное
         }
 
@@ -785,7 +808,7 @@ public class MainJFrame extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // Старт:
         habitat1.start_sim();
-        keys_state_InStart(true);
+        keys_state_InProgress();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton_MotoSleepAwakeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_MotoSleepAwakeActionPerformed
@@ -912,10 +935,11 @@ public class MainJFrame extends javax.swing.JFrame {
                 jLabel_infopath.setFont(new Font("Arial", Font.BOLD, 12));
                 jLabel_infopath.setText(msg+selectedFile.getAbsolutePath()+extension);
                 
-                // остановка 
+                // остановка
+                habitat1.pause_sim();//отжать паузу
                 habitat1.stop_sim();
-                keys_state_InStart(false);
-                jButton3.setText("Пауза"); // возвращает состояние кнопки пауза в исходное
+                keys_state_InStart();
+                //jButton3.setText("Пауза"); // возвращает состояние кнопки пауза в исходное
                 break;
                 
             case JFileChooser.CANCEL_OPTION:
@@ -1037,6 +1061,14 @@ public class MainJFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jTextArea2KeyPressed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // перед закрытием - сохраняем настройки
+        System.out.println("Настроечки надо сохранить");
+        
+        sMan.settings_save(getGUIState());
+        
+    }//GEN-LAST:event_formWindowClosing
+
     /**
      * @param args the command line arguments
      */
@@ -1086,6 +1118,9 @@ public class MainJFrame extends javax.swing.JFrame {
     private ExecutorService execConsole;
     private ExecutorService execConsListener;
     private ConsListner conl;
+    
+    private final SettingsMan sMan;
+    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
@@ -1141,4 +1176,108 @@ public class MainJFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
+
+    
+    private String[] getGUIState(){
+        int i = 0;
+        String sep = System.lineSeparator(); // системный символ перевода строки, "\n"
+        String[] res = new String[12];
+        
+        res[i++] =  jComboBox1.getName() + " ";
+        
+        res[i++] = (String)(jComboBox1.getSelectedItem()) + sep;
+        
+        res[i++] =  jComboBox2.getName() + " ";
+        
+        res[i++] = (String)(jComboBox2.getSelectedItem())+ sep;
+        
+        res[i++] =  jComboBox3.getName() + " ";
+        
+        res[i++] = (String)(jComboBox3.getSelectedItem())+ sep;
+        
+        res[i++] =  jComboBox_MotoPrior.getName() + " ";
+        
+        res[i++] = (String)(jComboBox_MotoPrior.getSelectedItem()+ sep);
+        
+        res[i++] =  jComboBox_CarPrior.getName() + " ";
+        
+        res[i++] = (String)(jComboBox_CarPrior.getSelectedItem()+ sep);
+       
+        if(jRadioButton1.isSelected()){
+            res[i++] = jRadioButton1.getName() + " 1"+ sep;
+        }
+        
+        if(jRadioButton2.isSelected()){
+            res[i++] = jRadioButton2.getName() + " 1"+ sep;
+        }
+        
+        return res;
+    }
+    
+    
+    private boolean setGUIState(String[] arrset){
+        
+        for(String s: arrset){
+            StringTokenizer tok = new StringTokenizer(s, " ");
+            String param = tok.nextToken();
+            String value = tok.nextToken();
+            
+           if(param.contains("вероятность_появления_машины")){
+//                if(value.endsWith("%")){
+//                   value = value.substring(0, value.length()-1);
+//                   
+//                }
+                value = value.substring(0, value.length()-1);
+                jComboBox1.setSelectedItem(value);
+           }
+           
+           if(param.contains("вероятность_появления_мотоцикла")){
+                value = value.substring(0, value.length()-1);
+                jComboBox2.setSelectedItem(value);
+           }
+           
+           if(param.contains("период_рождения_мс")){
+                value = value.substring(0, value.length()-1);
+                jComboBox3.setSelectedItem(value);
+           }
+           
+           if(param.contains("мотоцикл_приоритет")){
+                value = value.substring(0, value.length()-1);
+                jComboBox_MotoPrior.setSelectedItem(value);
+           }
+           
+           if(param.contains("машина_приоритет")){
+                value = value.substring(0, value.length()-1);
+                jComboBox_CarPrior.setSelectedItem(value);
+           }
+           
+           if(param.contains("скрыть_таймер")){
+                //value = value.substring(0, value.length()-1);
+                if(!"0".equals(value)){
+                    jRadioButton2.setSelected(true);//радио_кнопка "скрыть таймер"
+                    jRadioButton1.setSelected(false); // радио_кнопка "показать таймер"
+                }else{
+                    jRadioButton2.setSelected(false);//радио_кнопка "скрыть таймер"
+                    jRadioButton1.setSelected(true); // радио_кнопка "показать таймер"
+                }
+           }
+           
+           if(param.contains("показать_таймер")){
+                //value = value.substring(0, value.length()-1);
+                if(!"0".equals(value)){
+                    jRadioButton2.setSelected(false);//радио_кнопка "скрыть таймер"
+                    jRadioButton1.setSelected(true); // радио_кнопка "показать таймер"
+                }else{
+                    jRadioButton2.setSelected(true);//радио_кнопка "скрыть таймер"
+                    jRadioButton1.setSelected(false); // радио_кнопка "показать таймер"
+                }
+           }
+           
+           
+           
+           
+        }
+        return true;
+    }
 }
+
