@@ -247,6 +247,7 @@
     <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
   <Events>
+    <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
     <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="formKeyTyped"/>
   </Events>
   <AuxValues>
@@ -385,6 +386,7 @@
         <Component class="javax.swing.JRadioButton" name="jRadioButton1">
           <Properties>
             <Property name="text" type="java.lang.String" value="&#x43f;&#x43e;&#x43a;&#x430;&#x437;&#x430;&#x442;&#x44c; &#x442;&#x430;&#x439;&#x43c;&#x435;&#x440;"/>
+            <Property name="name" type="java.lang.String" value="&#x43f;&#x43e;&#x43a;&#x430;&#x437;&#x430;&#x442;&#x44c;_&#x442;&#x430;&#x439;&#x43c;&#x435;&#x440;" noResource="true"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton1ActionPerformed"/>
@@ -394,6 +396,7 @@
           <Properties>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="&#x441;&#x43a;&#x440;&#x44b;&#x442;&#x44c; &#x442;&#x430;&#x439;&#x43c;&#x435;&#x440;"/>
+            <Property name="name" type="java.lang.String" value="&#x441;&#x43a;&#x440;&#x44b;&#x442;&#x44c;_&#x442;&#x430;&#x439;&#x43c;&#x435;&#x440;" noResource="true"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton2ActionPerformed"/>
@@ -482,6 +485,7 @@
                         <StringItem index="9" value="1000"/>
                       </StringArray>
                     </Property>
+                    <Property name="name" type="java.lang.String" value="&#x43f;&#x435;&#x440;&#x438;&#x43e;&#x434;_&#x440;&#x43e;&#x436;&#x434;&#x435;&#x43d;&#x438;&#x44f;_&#x43c;&#x441;" noResource="true"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox3ActionPerformed"/>
@@ -510,6 +514,7 @@
                       </StringArray>
                     </Property>
                     <Property name="selectedIndex" type="int" value="2"/>
+                    <Property name="name" type="java.lang.String" value="&#x432;&#x435;&#x440;&#x43e;&#x44f;&#x442;&#x43d;&#x43e;&#x441;&#x442;&#x44c;_&#x43f;&#x43e;&#x44f;&#x432;&#x43b;&#x435;&#x43d;&#x438;&#x44f;_&#x43c;&#x43e;&#x442;&#x43e;&#x446;&#x438;&#x43a;&#x43b;&#x430;" noResource="true"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox2ActionPerformed"/>
@@ -538,6 +543,7 @@
                       </StringArray>
                     </Property>
                     <Property name="selectedIndex" type="int" value="3"/>
+                    <Property name="name" type="java.lang.String" value="&#x432;&#x435;&#x440;&#x43e;&#x44f;&#x442;&#x43d;&#x43e;&#x441;&#x442;&#x44c;_&#x43f;&#x43e;&#x44f;&#x432;&#x43b;&#x435;&#x43d;&#x438;&#x44f;_&#x43c;&#x430;&#x448;&#x438;&#x43d;&#x44b;" noResource="true"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox1ActionPerformed"/>
@@ -691,6 +697,7 @@
                         <StringItem index="9" value="10"/>
                       </StringArray>
                     </Property>
+                    <Property name="name" type="java.lang.String" value="&#x43c;&#x43e;&#x442;&#x43e;&#x446;&#x438;&#x43a;&#x43b;_&#x43f;&#x440;&#x438;&#x43e;&#x440;&#x438;&#x442;&#x435;&#x442;" noResource="true"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox_MotoPriorActionPerformed"/>
@@ -717,6 +724,7 @@
                         <StringItem index="9" value="10"/>
                       </StringArray>
                     </Property>
+                    <Property name="name" type="java.lang.String" value="&#x43c;&#x430;&#x448;&#x438;&#x43d;&#x430;_&#x43f;&#x440;&#x438;&#x43e;&#x440;&#x438;&#x442;&#x435;&#x442;" noResource="true"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox_CarPriorActionPerformed"/>
